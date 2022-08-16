@@ -5,6 +5,7 @@ const path = require('path');
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
+//Connexion à MangoDB
 mongoose.connect('mongodb+srv://Piiquante:devroede@cluster0.vxlb0rv.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -13,6 +14,7 @@ mongoose.connect('mongodb+srv://Piiquante:devroede@cluster0.vxlb0rv.mongodb.net/
 
 const app = express();
 
+//headers pour débloquer les erreurs CORS (Puisque les resuêtes viennent de deux server différents)
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -21,7 +23,6 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
-
 
 app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
