@@ -1,5 +1,5 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const sauceRoutes = require('./routes/sauce');
@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://Piiquante:devroede@cluster0.vxlb0rv.mongodb.net/
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 const app = express();
-
+app.use(express.json());
 //headers pour débloquer les erreurs CORS (Puisque les resuêtes viennent de deux server différents)
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,8 +21,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   next();
 });
-
-app.use(bodyParser.json());
 
 app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
