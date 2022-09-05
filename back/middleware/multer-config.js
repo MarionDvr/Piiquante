@@ -8,7 +8,7 @@ const MIME_TYPES = {
 //Configurer le chemin et le nom de fichier pour les fichiers entrants
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'images');
+    callback(null, "images");
   },
   filename: (req, file, callback) => {
     const name = file.originalname.split(' ').join('_');
