@@ -54,7 +54,7 @@ exports.getAllSauces = (req, res, next) => {
 
 //LIKE, DISLIKE, - LIKE, - DISLIKE
 exports.likeDislikeSauce = (req, res, next) => {
-    //like
+    //LIKE
     if(req.body.like === 1) {
       Sauce.updateOne(
         { _id: req.params.id },
@@ -66,7 +66,7 @@ exports.likeDislikeSauce = (req, res, next) => {
       .then((sauce) => res.status(200).json({ message: "Like ajouté" }))
       .catch((error) => res.status(400).json({ error }));
     }
-    //Dislike
+    //DISLIKE
     else if(req.body.like === -1) {
       Sauce.updateOne(
         { _id:req.params.id },
@@ -77,6 +77,37 @@ exports.likeDislikeSauce = (req, res, next) => {
       )
       .then((sauce) => res.status(200).json({ message : "Dislike ajouté"}))
       .catch((error) => res.status(400).json({ error }));
+    }
+    //Si l'utilisateur a déjà voté et qu'il veut enlever son vote
+    else{ 
+      Sauce.findOne({ _id: req.params.id })
+        .then((sauce) => {
+          //Si l'utilisateur a déjà mit un like et qu'il l'enlève
+          if(sauce.usersLiked.includes(req.body.userId)) {
+            Sauce.updateOne(
+              { _id: req.params.id },
+              { 
+                $inc: { likes: -1 },
+                $pull: { usersLiked: req.body.userId }
+              }
+            )
+            .then((sauce) => res.status(200).json({ message: "Moins un like" }))
+            .catch((error) => res.status(400).json({ error }));
+          }
+          //Si l'utilisateur a déjà mit un dislike et qu'il l'enlève
+          else if(sauce.usersDisliked.includes(req.body.userId)) {
+            Sauce.updateOne(
+              { _id: req.params.id },
+              { 
+                $inc: { dislikes: -1 },
+                $pull: { usersDisliked: req.body.userId }
+              }
+            )
+            .then((sauce) => res.status(200).json({ message: "Moins un dislike" }))
+            .catch((error) => res.status(400).json({ error }));
+          }
+        })
+        .catch((error) => res.status(400).json({ error }));
     }
 };
 
