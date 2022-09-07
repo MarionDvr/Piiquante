@@ -54,64 +54,29 @@ exports.getAllSauces = (req, res, next) => {
 
 //LIKE, DISLIKE, - LIKE, - DISLIKE
 exports.likeDislikeSauce = (req, res, next) => {
-    Sauce.findOne({_id: req.params.id})
-    .then((Sauce) => {
-      //si l'utilisateur n'a pas encore mis de like
-      if(!Sauce.usersLiked.includes(req.body.userId) && req.body.likes === 1){
-        Sauce.updateOne(
-          {_id: req.params.id},
-          //Incrementer like de 1 et mettre le userId dans le tableau usersLiked
-          {
-            $inc: {likes: 1},
-            $push: {usersLiked: req.body.userId}
-          }
-          )
-        .then(() => res.status(201).json({ message : "Je like"}))
-        .catch(error => res.status(400).json({ error}));
-      }
-
-      //si l'utilisateur a enlevé son like
-      else if(Sauce.usersLiked.includes(req.body.userId) && req.body.likes === 0){
-        Sauce.updateOne(
-          {_id: req.params.id},
-          //Incrementer like de -1 et enlever le userId du tableau UserLiked
-          {
-            $inc: {likes: -1},
-            $pull: {usersLiked: req.body.userId}
-          }
-          )
-        .then(() => res.status(201).json({ message : "J'enlève le like"}))
-        .catch(error => res.status(400).json({ error}));
-      }
-
-      //si l'utilisateur n'a pas encore mis de dislike
-      else if(!Sauce.usersDisliked.includes(req.body.userId) && req.body.dislikes === 1){
-        Sauce.updateOne(
-          {_id: req.params.id},
-          //Incrementer like de -1 et mettre le userId dans le tableau usersDisliked
-          {
-            $inc: {likes: -1},
-            $push: {usersDisliked: req.body.userId}
-          }
-          )
-        .then(() => res.status(201).json({ message : "Je dislike"}))
-        .catch(error => res.status(400).json({ error }));
-      }
-
-      //si l'utilisateur a enlevé son dislike
-      else if(Sauce.usersDisliked.includes(req.body.userId) && req.body.dislikes === 0){
-        Sauce.updateOne(
-          {_id: req.params.id},
-          //Incrementer dislike de 1 et enlever le userId du tableau usersDisliked
-          {
-            $inc: {dislikes: 1},
-            $pull: {usersDisliked: req.body.userId}
-          }
-          )
-        .then(() => res.status(201).json({ message : "J'enlève le dislike"}))
-        .catch(error => res.status(400).json({ error }));
-      }
-    })
-    .catch(error => res.status(404).json({ error }));
+    //like
+    if(req.body.like === 1) {
+      Sauce.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { likes: req.body.like++ },
+          $push: { usersLiked: req.body.userId }
+        }
+      )
+      .then((sauce) => res.status(200).json({ message: "Like ajouté" }))
+      .catch((error) => res.status(400).json({ error }));
+    }
+    //Dislike
+    else if(req.body.like === -1) {
+      Sauce.updateOne(
+        { _id:req.params.id },
+        {
+          $inc: { dislikes: req.body.like++ * -1 },
+          $push: {usersDisliked: req.body.userId }
+        }
+      )
+      .then((sauce) => res.status(200).json({ message : "Dislike ajouté"}))
+      .catch((error) => res.status(400).json({ error }));
+    }
 };
 
