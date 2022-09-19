@@ -22,9 +22,21 @@ exports.createSauce = (req, res, next) => {
 
 //MODIFIER une sauce
 exports.modifySauce = (req, res, next) => {
-    Sauce.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Sauce modifiée' }))
-        .catch(error => res.status(400).json({ error }));
+  const sauceObject = req.file ? { 
+    ...JSON.parse(req.body.sauce),
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+  } : {
+    ...req.body
+  };
+  delete sauceObject.userId;
+  Sauce.findOne({ _id: req.params.id })
+  .then(sauce => {
+  Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
+
+      .then(() => res.status(200).json({ message: 'Sauce modifiée' }))
+    })
+      .catch(error => res.status(400).json({ error }));
+  
 };
 
 
@@ -82,7 +94,7 @@ exports.likeDislikeSauce = (req, res, next) => {
     else{ 
       Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-          //Si l'utilisateur a déjà mit un like et qu'il l'enlève
+          //Si l'utilisateur a déjà mis un like et qu'il l'enlève
           if(sauce.usersLiked.includes(req.body.userId)) {
             Sauce.updateOne(
               { _id: req.params.id },
@@ -94,7 +106,7 @@ exports.likeDislikeSauce = (req, res, next) => {
             .then((sauce) => res.status(200).json({ message: "Moins un like" }))
             .catch((error) => res.status(400).json({ error }));
           }
-          //Si l'utilisateur a déjà mit un dislike et qu'il l'enlève
+          //Si l'utilisateur a déjà mis un dislike et qu'il l'enlève
           else if(sauce.usersDisliked.includes(req.body.userId)) {
             Sauce.updateOne(
               { _id: req.params.id },
