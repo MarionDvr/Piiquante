@@ -1,4 +1,5 @@
 const Sauce = require('../models/Sauce');
+const fs = require('fs');
 
 //CREER une sauce
 exports.createSauce = (req, res, next) => {
@@ -22,20 +23,34 @@ exports.createSauce = (req, res, next) => {
 
 //MODIFIER une sauce
 exports.modifySauce = (req, res, next) => {
-  const sauceObject = req.file ? { 
-    ...JSON.parse(req.body.sauce),
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  } : {
-    ...req.body
-  };
-  delete sauceObject.userId;
-  Sauce.findOne({ _id: req.params.id })
-  .then(sauce => {
-  Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
-
-      .then(() => res.status(200).json({ message: 'Sauce modifiée' }))
-    })
-      .catch(error => res.status(400).json({ error }));
+  let sauceObject = {};
+  //Si le fichier est modifié, enregistrer la nouvelle image, sinon enregistrer le reste
+  //Si la requete concerne le fichier (img)
+  req.file ? (
+    Sauce.findOne({ _id: req.params.id })
+      .then((sauce) => {
+      // Récupération du nom de l'image sur le server
+      const imgName = sauce.imageUrl.split('/images/')[1]
+      //Suppression de l'image
+      fs.unlink(`images/${imgName}`)
+      }),
+    sauceObject = {
+      ...JSON.parse(req.body.sauce),
+      //Ajout de la nouvelle image
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${
+        req.file.filename
+      }`,
+    }
+  ) : (
+    //Si la requete ne concerne pas le ficher (img)
+      sauceObject = {
+      ...req.body 
+      }
+    );
+    //mise à jour de la base de donnée
+    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+      .then(() => { res.status(200).json({ message: 'Sauce modifiée!' }); })
+      .catch((error) => { res.status(400).json({ error }); });
   
 };
 
