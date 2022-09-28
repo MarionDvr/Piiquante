@@ -13,5 +13,5 @@ const sauceSchema = mongoose.Schema({
     usersLiked: { type: [String], default: [] },
     usersDisliked: { type: [String], default: [] },
 });
-//Exportation du schéma en tant que modèle mongoose
+//Exportation du schéma en tant que modèle mongoose et disponible pour l'app
 module.exports = mongoose.model('Sauce', sauceSchema);

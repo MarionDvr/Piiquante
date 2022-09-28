@@ -40,7 +40,7 @@ exports.login = (req, res, next) => {
                             //Si le mot de passe est valide, renvoie de la réponse avec l'id utilisateur et le token
                             res.status(200).json({
                                 userId: user._id,
-                                //sign() pour chiffrer un nouveau token (qui contient L'id utilisateur, la clef secret pour crypter le token et la durée de validité du token)
+                                //sign() pour chiffrer un nouveau token (qui contient L'id utilisateur, la clef secrète pour crypter le token et la durée de validité du token)
                                 token: jwt.sign(
                                     { userId: user._id },
                                     'PIIQUANTE_TOKEN_SECRET',
