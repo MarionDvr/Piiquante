@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 //Connexion à MangoDB
-mongoose.connect('mongodb+srv://Piiquante:devroede@cluster0.vxlb0rv.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://Piiquante:devroede@cluster0.vxlb0rv.mongodb.net/Piiquante?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
